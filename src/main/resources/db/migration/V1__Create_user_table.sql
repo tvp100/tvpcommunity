@@ -1,6 +1,6 @@
 CREATE TABLE USER
 (
-    ID int AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    ID bigint AUTO_INCREMENT PRIMARY KEY NOT NULL,
     ACCOUNT_ID varchar(100),
     NAME varchar(50),
     TOKEN varchar(36),

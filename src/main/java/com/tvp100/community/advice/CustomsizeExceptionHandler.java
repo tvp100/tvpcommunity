@@ -1,0 +1,60 @@
+package com.tvp100.community.advice;
+
+import com.alibaba.fastjson.JSON;
+import com.tvp100.community.dto.ResultDTO;
+import com.tvp100.community.exception.CustomizeErrorCode;
+import com.tvp100.community.exception.CustomizeException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.lang.reflect.Method;
+
+
+/**
+ * Created by tvp100 on 2020/4/1.
+ */
+@ControllerAdvice
+public class CustomsizeExceptionHandler {
+    @ExceptionHandler(Exception.class)
+    ModelAndView handleControllerException(HttpServletRequest request, Throwable ex, Model model, HttpServletResponse response){
+        String contentType = request.getContentType();
+        if ("application/json".equals(contentType)){
+            ResultDTO resultDTO;
+            //返回json
+            if (ex instanceof CustomizeException){
+                resultDTO = ResultDTO.errorOf((CustomizeException)ex);
+            }else {
+                resultDTO = ResultDTO.errorOf(CustomizeErrorCode.SYS_ERROR);
+            }
+            try {
+                response.setContentType("application/json");
+                response.setStatus(200);
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter writer = response.getWriter();
+                writer.write(JSON.toJSONString(resultDTO));
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }else {
+            //错误页面跳转操作
+            if (ex instanceof CustomizeException){
+                model.addAttribute("message", ex.getMessage());
+            }else {
+                model.addAttribute("message", CustomizeErrorCode.SYS_ERROR.getMessage());
+            }
+            return new ModelAndView("error");
+        }
+    }
+}

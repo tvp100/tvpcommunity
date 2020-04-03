@@ -1,14 +1,16 @@
 package com.tvp100.community.controller;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.tvp100.community.mapper.QuestionMapper;
-import com.tvp100.community.mapper.UserMapper;
+
+import com.tvp100.community.dto.QuestionDTO;
 import com.tvp100.community.mode.Question;
 import com.tvp100.community.mode.User;
+import com.tvp100.community.service.QuestionService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -19,32 +21,26 @@ import javax.servlet.http.HttpServletRequest;
  * Created by tvp100 on 2020/3/5.
  */
 @Controller
-public class PublicController {
+public class PublishController {
 
-    @Autowired(required = false)
-     private QuestionMapper questionMapper;
+    @Autowired
+    private QuestionService questionService;
 
-    @Autowired(required = false)
-    private UserMapper userMapper;
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable("id")Long id,
+                       Model model){
+        QuestionDTO question = questionService.getById(id);
+        model.addAttribute("title",question.getTitle());
+        model.addAttribute("description",question.getDescription());
+        model.addAttribute("tag",question.getTag());
+        model.addAttribute("id",question.getId());
+        return "publish";
+    }
+
+
 
     @GetMapping("/publish")
     public String publish(HttpServletRequest request){
-        Cookie[] cookies = request.getCookies();
-        if(cookies == null)
-            return "publish";
-        User user = null;
-        for (Cookie cookie : cookies){
-            if (cookie == null)
-                return "index";
-            if ("token".equals(cookie.getName())){
-                String token = cookie.getValue();
-                user = userMapper.findByToken(token);
-                if (user!=null){
-                    request.getSession().setAttribute("user",user);
-                }
-                break;
-            }
-        }
         return "publish";
     }
 
@@ -52,11 +48,26 @@ public class PublicController {
     public String doPublish(@RequestParam("title")String title,
                             @RequestParam("description")String description,
                             @RequestParam("tag")String tag,
+                            @RequestParam("id") Long id,
                             HttpServletRequest request,
                             Model model){
         model.addAttribute("title",title);
         model.addAttribute("description",description);
         model.addAttribute("tag",tag);
+        //为了偷懒不写进数据库里面再搞个查找方法了，其实这里由前端验证比较好，双向验证是最安全的，我就后端投个懒
+        String hasTags = "C++JavaPythonphpAndroidiosJavascripthtmlgolangSpringDjangovue.jsreact.jsbootstrapnode." +
+                "jsDatabaseMysqlOraclemongodbsqljsonnosqlelasticsearch运维LinuxnginxdockerapachecentOSubuntu" +
+                "Debianfabricssh负载均衡gitgithubmacOSvisual-studio-codeWindowsvimintellij-ideaeclipsewebstor" +
+                "msvnpycharmvisual-studiophpstormNotePad++";
+        //处理tag
+        tag = StringUtils.replace(StringUtils.replace(tag,"，",","),",","|");
+        String[] targetTag = StringUtils.split(tag,"|");
+        for (String realTag : targetTag) {
+            if (hasTags.indexOf(realTag)==-1){
+                model.addAttribute("error","标签输入不合法，请点击或输入提示标签");
+                return "publish";
+            }
+        }
         if(title==null || title==""){
             model.addAttribute("error","标题不能为空");
             return "publish";
@@ -74,19 +85,7 @@ public class PublicController {
             model.addAttribute("error","用户未登录");
             return "publish";
         }
-        User user = null;
-        for (Cookie cookie : cookies){
-            if (cookie == null)
-                return "index";
-            if ("token".equals(cookie.getName())){
-                String token = cookie.getValue();
-                user = userMapper.findByToken(token);
-                if (user!=null){
-                    request.getSession().setAttribute("user",user);
-                }
-                break;
-            }
-        }
+        User user = (User) request.getSession().getAttribute("user");
         if (user==null){
             model.addAttribute("error","用户未登录");
             return "publish";
@@ -96,9 +95,8 @@ public class PublicController {
         question.setDescription(description);
         question.setTag(tag);
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
-        questionMapper.create(question);
+        question.setId(id);
+        questionService.createOrUpdate(question);
         return "redirect:/";
     }
 }

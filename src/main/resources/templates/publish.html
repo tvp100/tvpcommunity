@@ -5,51 +5,18 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>发布 - tvp的社区</title>
     <script src="jquery-3.3.1.js" type="application/javascript"></script>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="css/community.css">
-    <script src="js/bootstrap.min.js" type="application/javascript"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/community.css">
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/community.js" type="application/javascript"></script>
 </head>
 
 
 <body>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span class="sr-only">tvp100的社区</span>
-            </button>
-            <a class="navbar-brand" href="/">tvp100的社区</a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <form class="navbar-form navbar-left">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="搜索">
-                </div>
-                <button type="submit" class="btn btn-default">搜索</button>
-            </form>
-            <ul class="nav navbar-nav navbar-right">
-                <li th:if="${session.user} != null">
-                    <a href="/publish">发布</a>
-                </li>
-                <li class="dropdown" th:if="${session.user != null}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">[[${session.user.getName()}]] <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">消息中心</a></li>
-                        <li><a href="#">个人资料</a></li>
-                        <li><a href="#">退出登陆</a></li>
-                    </ul>
-                </li>
-                <li th:unless="${session.user != null}">
-                    <a href="https://github.com/login/oauth/authorize?client_id=f1dc16ae477b1a50128f&redirect_uri=http://localhost:8080/callback&scope=user&state=1">登陆</a>
-                </li>
-            </ul>
-        </div>
-    </div>
 
-</nav>
+<div th:replace="navigation :: nav"></div>
+
 <div class="container-fluid main">
     <div class="row">
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
@@ -57,18 +24,94 @@
             <hr>
 
             <form action="/publish" method="post">
+                <input type="hidden" name="id" th:value="${id}">
                 <div class="form-group">
                     <label for="title">问题标题:</label>
                     <input type="text" class="form-control" th:value="${title}" id="title" name="title" placeholder="问题标题......">
                 </div>
                 <div class="form-group">
-                    <label for="description">问题补充:</label>
+                    <label for="description">问题补充:（必填，请参照右侧提示）</label>
                     <textarea name="description" th:text="${description}" id="description" class="form-control" cols="30"
                               rows="10"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="tag">添加标签:</label>
-                    <input type="text" class="form-control" th:value="${tag}" id="tag" name="tag" placeholder="输入标签,以，隔开">
+                    <input type="text" class="form-control" th:value="${tag}" id="tag" name="tag"
+                           placeholder="输入标签,如: java 以逗号，分隔"
+                           onfocus="showSelectTag()" >
+                    <!--标签-->
+                    <div style="margin-top: 16px">
+                        <div id="select-tag" style="display: none">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">语言</a></li>
+                                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">框架</a></li>
+                                <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">数据库</a></li>
+                                <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">运维</a></li>
+                                <li role="presentation"><a href="#tools" aria-controls="tools" role="tab" data-toggle="tab">工具</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="home">
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('C++')" style="cursor: pointer;">C++</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Java')" style="cursor: pointer;">Java</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Python')" style="cursor: pointer;">Python</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('php')" style="cursor: pointer;">php</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Android')" style="cursor: pointer;">Android</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('ios')" style="cursor: pointer;">ios</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Javascript')" style="cursor: pointer;">Javascript</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('html')" style="cursor: pointer;">html</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('golang')" style="cursor: pointer;">golang</span></span>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="profile">
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Spring')" style="cursor: pointer;">Spring</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Django')" style="cursor: pointer;">Django</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('vue.js')" style="cursor: pointer;">vue.js</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('react.js')" style="cursor: pointer;">react.js</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('bootstrap')" style="cursor: pointer;">bootstrap</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('node.js')" style="cursor: pointer;">node.js</span></span>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="messages">
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Database')" style="cursor: pointer;">Database</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Mysql')" style="cursor: pointer;">Mysql</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Oracle')" style="cursor: pointer;">Oracle</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('mongodb')" style="cursor: pointer;">mongodb</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('sql')" style="cursor: pointer;">sql</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('json')" style="cursor: pointer;">json</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('nosql')" style="cursor: pointer;">nosql</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('elasticsearch')" style="cursor: pointer;">elasticsearch</span></span>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="settings">
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('运维')" style="cursor: pointer;">运维</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Linux')" style="cursor: pointer;">Linux</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('nginx')" style="cursor: pointer;">nginx</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('docker')" style="cursor: pointer;">docker</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('apache')" style="cursor: pointer;">apache</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('centOS')" style="cursor: pointer;">centOS</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('ubuntu')" style="cursor: pointer;">ubuntu</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Debian')" style="cursor: pointer;">Debian</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('fabric')" style="cursor: pointer;">fabric</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('ssh')" style="cursor: pointer;">ssh</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('负载均衡')" style="cursor: pointer;">负载均衡</span></span>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="tools">
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('git')" style="cursor: pointer;">git</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('github')" style="cursor: pointer;">github</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('macOS')" style="cursor: pointer;">macOS</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('visual-studio-code')" style="cursor: pointer;">visual-studio-code</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('Windows')" style="cursor: pointer;">Windows</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('vim')" style="cursor: pointer;">vim</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('intellij-idea')" style="cursor: pointer;">intellij-idea</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('eclipse')" style="cursor: pointer;">eclipse</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('webstorm')" style="cursor: pointer;">webstorm</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('svn')" style="cursor: pointer;">svn</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('pycharm')" style="cursor: pointer;">pycharm</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('visual-studio')" style="cursor: pointer;">visual-studio</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('phpstorm')" style="cursor: pointer;">phpstorm</span></span>
+                                    <span class="label label-info" style="font-size: 11px"><span class="glyphicon glyphicon-tag" onclick="selectTag('NotePad++')" style="cursor: pointer;">NotePad++</span></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
 
                 <span class="alert alert-danger" th:if="${error}!=null" th:text="${error}"></span>
