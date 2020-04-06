@@ -3,6 +3,7 @@ package com.tvp100.community.interceptor;
 import com.tvp100.community.mapper.UserMapper;
 import com.tvp100.community.mode.User;
 import com.tvp100.community.mode.UserExample;
+import com.tvp100.community.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,9 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Autowired(required = false)
     private UserMapper userMapper;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Cookie[] cookies = request.getCookies();
@@ -39,6 +43,8 @@ public class SessionInterceptor implements HandlerInterceptor {
                     if (users.size() != 0) {
                         request.getSession().setAttribute("user", users.get(0));
                         System.out.println(cookie.getValue());
+                        Long unreadCount = notificationService.GetUnreadCount(users.get(0).getId());
+                        request.getSession().setAttribute("unreadCount",unreadCount);
                     }
 
                     break;

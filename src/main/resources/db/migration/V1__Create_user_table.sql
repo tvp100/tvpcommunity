@@ -5,5 +5,7 @@ CREATE TABLE USER
     NAME varchar(50),
     TOKEN varchar(36),
     GMT_CREATE bigint,
-    GMT_MODIFIED bigint
-)
+    GMT_MODIFIED bigint,
+    sex INT DEFAULT 0 NULL,
+    pwd VARCHAR(100) NULL
+);

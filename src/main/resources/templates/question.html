@@ -7,9 +7,13 @@
     <script src="/jquery-3.3.1.js" type="application/javascript"></script>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/editormd.preview.css">
     <script src="/js/bootstrap.min.js" type="application/javascript"></script>
     <script src="/js/community.js" type="application/javascript"></script>
     <script src="/js/moment.min.js" type="application/javascript"></script>
+    <script src="/js/editormd.min.js" type="application/javascript"></script>
+    <script src="/js/lib/marked.min.js" type="application/javascript"></script>
+    <script src="/js/lib/prettify.min.js" type="application/javascript"></script>
     <link rel="stylesheet" href="/css/community.css">
 </head>
 
@@ -31,9 +35,20 @@
                 阅读数：<span th:text="${question.viewCount==null?0:question.viewCount}"></span>
             </span>
                 <hr>
-                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:text="${question.description}"></div>
-                <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <!--内容-->
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="question-view">
+                    <textarea style="display:none;" th:text="${question.description}"></textarea>
+                </div>
+
+                <!--markdown的js-->
+                <script type="text/javascript">
+                    $(function() {
+                        editormd.markdownToHTML("question-view", {});
+                    });
+                </script>
+
                 <!--标签-->
+                <hr class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <span class="label label-info question-tag" th:each="tag : ${question.tag.split('\|')}">
                         <span class="glyphicon glyphicon-tag"></span>
@@ -108,12 +123,12 @@
                     <div class="media-left">
                         <a href="#">
                             <img class="media-object img-rounded"
-                                 th:src="@{${question.user.avatarUrl}}">
+                                 th:src="@{${session.user!=null?session.user.avatarUrl:'/image/default-user-avatar.png'}}">
                         </a>
                     </div>
                     <div class="media-body" style="padding-top: 10px">
                         <h5 class="media-heading">
-                            <span th:text="${question.user.name}">标题</span>
+                            <span th:text="${session.user!=null?session.user.name:'匿名用户'}">标题</span>
                         </h5>
                     </div>
                 </div>
@@ -160,6 +175,9 @@
         </div>
     </div>
 </div>
+
+<!--页尾-->
+<div th:insert="~{footer :: foot}"></div>
 </body>
 
 </html>

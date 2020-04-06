@@ -45,4 +45,23 @@
         *
         from QUESTION WHERE ID!= #{id} AND tag regexp #{tag}
     </select>
+
+    <select id="countBySearch" parameterType="com.tvp100.community.dto.QuestionQueryDTO" resultType="java.lang.Integer">
+        select COUNT(*) from QUESTION
+        <where>
+            <if test="search != null">
+                    AND TITLE regexp #{search}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectBySearch" parameterType="com.tvp100.community.dto.QuestionQueryDTO" resultMap="BaseResultMap">
+        select * from QUESTION
+        <where>
+            <if test="search != null">
+                AND TITLE regexp #{search}
+            </if>
+        </where>
+        order by gmt_create DESC limit #{page},#{size}
+    </select>
 </mapper>

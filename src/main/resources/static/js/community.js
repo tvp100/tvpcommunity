@@ -6,6 +6,7 @@ function commentPost() {
     comment2target(questionId,1,content);
 }
 
+//回复的Post功能
 function comment2target(targetId,type,content) {
     if (!content){
         alert("输入的内容不能为空~");
@@ -28,7 +29,7 @@ function comment2target(targetId,type,content) {
                 if(response.code==2003){
                     var isAccepted = confirm(response.message);
                     if (isAccepted){
-                        window.open("https://github.com/login/oauth/authorize?client_id=f1dc16ae477b1a50128f&redirect_uri=http://localhost:8080/callback&scope=user&state=1");
+                        window.open("http://localhost:8080/mySignIn");
                         window.localStorage.setItem("closable","true");
                     }
                 }else {
@@ -40,6 +41,7 @@ function comment2target(targetId,type,content) {
     });
 }
 
+//提交二级评论
 function childCommentPost(e) {
     var commentId = e.getAttribute("data-id");
     console.log(commentId);
@@ -96,6 +98,7 @@ function getChildComment(e) {
     }
 }
 
+//选择标签
 function selectTag(value) {
     var previous = $("#tag").val();
     if(previous.indexOf(value)==-1){
@@ -113,4 +116,100 @@ function showSelectTag() {
 
 function hiddenSelectTag() {
     $("#select-tag").attr("style","display:none;");
+}
+
+//注册
+function sighUp() {
+    var accountid = $("#register-accountid")[0].value;
+    var password1 = $("#register-password")[0].value;
+    var password2 = $("#register-passwords")[0].value;
+    var username = $("#register-username")[0].value;
+    var sex = $("input[name='sex']:checked").val();
+    if (accountid==""){
+        alert("账号不能为空");
+        return;
+    }
+    if (username==""){
+        alert("昵称不能为空");
+        return;
+    }
+    if (password1==""||password2==""){
+        alert("请输入密码");
+        return;
+    }
+    if (password1!=password2){
+        alert("两次密码输入不一致");
+        return;
+    }
+    if (sex==null){
+        alert("请选择你的性别");
+        return;
+    }
+
+
+    $.ajax({
+        type: "POST",
+        url: "/userSignUp",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "pwd": password1,
+            "accountId": accountid,
+            "sex": sex,
+            "name" : username
+        }),
+        success: function (response) {
+            //$(window).attr('location','http://localhost:8080/');
+            console.log(response);
+            if (response.code==300){
+                alert("账号已存在");
+                return;
+            }
+            if (response.code==200){
+                $(window).attr('location','http://localhost:8080/');
+            }
+            if (response.code==2004){
+                alert(response.message);
+            }
+        },
+        dataType: "json"
+    });
+}
+
+//登陆
+function sighIn() {
+    var accountid = $("#sin-accountid")[0].value;
+    var password = $("#sin-password")[0].value;
+    if (accountid==""){
+        alert("账号不能为空");
+        return;
+    }
+    if (password==""){
+        alert("请输入密码");
+        return;
+    }
+    $.ajax({
+        type: "POST",
+        url: "/userSignIn",
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "pwd": password,
+            "accountId": accountid
+        }),
+        success: function (response) {
+            //$(window).attr('location','http://localhost:8080/');
+            console.log(response);
+            if (response.code==300){
+                alert(response.message);
+                return;
+            }
+            if (response.code==2004){
+                alert("账号不存在");
+                return;
+            }
+            if (response.code==200){
+                $(window).attr('location','http://localhost:8080/');
+            }
+        },
+        dataType: "json"
+    });
 }

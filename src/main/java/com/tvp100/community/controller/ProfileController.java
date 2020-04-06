@@ -1,8 +1,10 @@
 package com.tvp100.community.controller;
 
+import com.tvp100.community.dto.NotificationDTO;
 import com.tvp100.community.dto.PaginationDTO;
 import com.tvp100.community.mapper.UserMapper;
 import com.tvp100.community.mode.User;
+import com.tvp100.community.service.NotificationService;
 import com.tvp100.community.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * Created by tvp100 on 2020/3/7.
@@ -20,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class ProfileController {
 
-    @Autowired(required = false)
-    private UserMapper userMapper;
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private QuestionService questionService;
@@ -38,14 +41,14 @@ public class ProfileController {
         if("questions".equals(action)){
             model.addAttribute("section","questions");
             model.addAttribute("sectionName","我的提问");
+            PaginationDTO paginationDTO = questionService.list(user.getId(), page, size);
+            model.addAttribute("pagination", paginationDTO);
         }else if ("replies".equals(action)){
+            PaginationDTO paginationDTO = notificationService.list(user.getId(),page,size);
+            model.addAttribute("pagination",paginationDTO);
             model.addAttribute("section","replies");
             model.addAttribute("sectionName","最新回复");
         }
-
-
-        PaginationDTO paginationDTO = questionService.list(user.getId(), page, size);
-        model.addAttribute("pagination", paginationDTO);
         return "profile";
     }
 }

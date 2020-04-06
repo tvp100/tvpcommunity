@@ -41,4 +41,42 @@ public class UserService {
             userMapper.updateByExampleSelective(updateUser, example1);
         }
     }
+
+    public String verifyUser(String username, String pwd) {
+        UserExample example = new UserExample();
+        example.createCriteria()
+                .andAccountIdEqualTo(username);
+        List<User> users = null;
+        try {
+            users = userMapper.selectByExample(example);
+        } catch (Exception e) {
+                return "用户不存在";
+        }
+        if (!users.get(0).getPwd().equals(pwd)){
+            return "密码错误";
+        }
+        if (users.get(0).getPwd().equals(pwd)){
+            return "success";
+        }
+        return "系统异常";
+    }
+
+    public User getUser(String accountid) {
+        UserExample example = new UserExample();
+        example.createCriteria()
+                .andAccountIdEqualTo(accountid);
+        List<User> users = userMapper.selectByExample(example);
+        return users.get(0);
+    }
+
+    public void UpdateUser(User user) {
+        UserExample example = new UserExample();
+        example.createCriteria()
+                .andIdEqualTo(user.getId());
+        userMapper.updateByExampleSelective(user, example);
+    }
+
+    public void insertUser(User user) {
+        userMapper.insert(user);
+    }
 }
