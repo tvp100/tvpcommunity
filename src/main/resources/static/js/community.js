@@ -29,7 +29,7 @@ function comment2target(targetId,type,content) {
                 if(response.code==2003){
                     var isAccepted = confirm(response.message);
                     if (isAccepted){
-                        window.open("http://localhost:8080/mySignIn");
+                        window.open("http://47.113.92.160/mySignIn");
                         window.localStorage.setItem("closable","true");
                     }
                 }else {
@@ -165,7 +165,7 @@ function sighUp() {
                 return;
             }
             if (response.code==200){
-                $(window).attr('location','http://localhost:8080/');
+                $(window).attr('location','http://47.113.92.160/');
             }
             if (response.code==2004){
                 alert(response.message);
@@ -196,7 +196,7 @@ function sighIn() {
             "accountId": accountid
         }),
         success: function (response) {
-            //$(window).attr('location','http://localhost:8080/');
+            //$(window).attr('location','http://47.113.92.160/');
             console.log(response);
             if (response.code==300){
                 alert(response.message);
@@ -207,7 +207,7 @@ function sighIn() {
                 return;
             }
             if (response.code==200){
-                $(window).attr('location','http://localhost:8080/');
+                $(window).attr('location','http://47.113.92.160/');
             }
         },
         dataType: "json"

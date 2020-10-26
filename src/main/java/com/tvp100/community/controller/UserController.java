@@ -42,8 +42,7 @@ public class UserController {
             if (user.getSex() == 0) {
                 //0为女生
                 user.setAvatarUrl("/image/Girl-avatar.png");
-            }
-            {
+            }else {
                 //1为男生
                 user.setAvatarUrl("/image/Boy-avatar.png");
             }

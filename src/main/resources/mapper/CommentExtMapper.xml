@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tvp100.community.mapper.CommentExtMapper">
+  
   <resultMap id="BaseResultMap" type="com.tvp100.community.mode.Comment">
     <!--
       WARNING - @mbg.generated
@@ -17,6 +18,7 @@
     <result column="CONTENT" jdbcType="VARCHAR" property="content" />
     <result column="COMMENT_COUNT" jdbcType="BIGINT" property="commentCount" />
   </resultMap>
+  
   <update id="incCommentCount" parameterType="map">
     <!--
       WARNING - @mbg.generated
